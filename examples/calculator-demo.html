@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Price Calculator Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .form-section, .result-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        input[type="number"], select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .extras-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .extras-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        
+        .price-breakdown {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .breakdown-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .breakdown-line.extra {
+            font-size: 13px;
+            color: #666;
+            padding-left: 10px;
+        }
+        
+        .breakdown-line.discount {
+            color: #10b981;
+        }
+        
+        .breakdown-line.subtotal {
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+        
+        .breakdown-line.total {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            margin: 10px -20px -20px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .breakdown-line.daily-rate {
+            background: #e0e7ff;
+            padding: 10px;
+            margin: -20px -20px 0;
+            font-size: 13px;
+            color: #4c51bf;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Rental Price Calculator</h1>
+            <p>Calculate your rental price with transparent breakdown</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="dailyPrice">Daily Price (฿)</label>
+                    <input type="number" id="dailyPrice" value="2500" min="0" step="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="days">Rental Days</label>
+                    <input type="number" id="days" value="10" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="seasonMultiplier">Season Multiplier</label>
+                    <select id="seasonMultiplier">
+                        <option value="0.9">Low Season (×0.9)</option>
+                        <option value="1.0" selected>Normal (×1.0)</option>
+                        <option value="1.2">High Season (×1.2)</option>
+                        <option value="1.5">Peak Season (×1.5)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="classMultiplier">Car Class Multiplier</label>
+                    <select id="classMultiplier">
+                        <option value="0.8">Economy (×0.8)</option>
+                        <option value="1.0" selected>Standard (×1.0)</option>
+                        <option value="1.2">Premium (×1.2)</option>
+                        <option value="1.5">Luxury (×1.5)</option>
+                    </select>
+                </div>
+                
+                <div class="extras-section">
+                    <h3>Extra Options</h3>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="childSeat" value="300">
+                        <label for="childSeat">Child Seat (+300 ฿)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="gps" value="200">
+                        <label for="gps">GPS Navigator (+200 ฿)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="delivery" value="500">
+                        <label for="delivery">Delivery (+500 ฿)</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deposit">Deposit (฿)</label>
+                    <input type="number" id="deposit" value="10000" min="0" step="1000">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeDeposit">
+                    <label for="includeDeposit">Include deposit in total</label>
+                </div>
+                
+                <button onclick="calculatePrice()">Calculate Price</button>
+            </div>
+            
+            <div class="result-section">
+                <h2 style="color: #333; margin-bottom: 10px;">Price Breakdown</h2>
+                <div id="result" class="price-breakdown">
+                    <p style="text-align: center; color: #999;">Click "Calculate Price" to see the breakdown</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../assets/js/rental-price-calculator.js"></script>
+    <script>
+        const calculator = new RentalPriceCalculator({
+            minTotal: 1500,
+            roundTo: 1,
+            platformFeePercent: 7,
+        });
+        
+        function calculatePrice() {
+            // Get form values
+            const dailyPrice = parseFloat(document.getElementById('dailyPrice').value);
+            const days = parseInt(document.getElementById('days').value);
+            const seasonMultiplier = parseFloat(document.getElementById('seasonMultiplier').value);
+            const classMultiplier = parseFloat(document.getElementById('classMultiplier').value);
+            const deposit = parseFloat(document.getElementById('deposit').value);
+            const includeDeposit = document.getElementById('includeDeposit').checked;
+            
+            // Get extras
+            const extras = {};
+            if (document.getElementById('childSeat').checked) {
+                extras.childSeat = 300;
+            }
+            if (document.getElementById('gps').checked) {
+                extras.gps = 200;
+            }
+            if (document.getElementById('delivery').checked) {
+                extras.delivery = 500;
+            }
+            
+            // Calculate
+            const result = calculator.calculate({
+                dailyPrice,
+                days,
+                seasonMultiplier,
+                classMultiplier,
+                extras,
+                deposit,
+                includeDepositInTotal: includeDeposit,
+            });
+            
+            // Display result
+            document.getElementById('result').innerHTML = calculator.generateBreakdownHTML(result);
+        }
+        
+        // Auto-calculate on input change
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('change', calculatePrice);
+            element.addEventListener('input', calculatePrice);
+        });
+        
+        // Initial calculation
+        calculatePrice();
+    </script>
+</body>
+</html>

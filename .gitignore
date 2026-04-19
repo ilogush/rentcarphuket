@@ -1,0 +1,56 @@
+.env
+!.env.production.example
+.DS_Store
+*.log
+/vendor/
+/node_modules/
+
+# Screenshots and temp files in project root
+/*.png
+/*.jpg
+/*.jpeg
+
+# Log files
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# Cache files
+/storage/cache/*
+!/storage/cache/.gitkeep
+
+# Temporary files
+*.tmp
+*.lock
+*.bak
+*.swp
+*~
+
+# Legacy file
+/data.php
+
+# Documentation files (не нужны на production)
+/BEFORE_AFTER_COMPARISON.md
+/COMPONENTS_GUIDE.md
+/COMPONENTS_STRUCTURE.md
+/INDEX_DOCUMENTATION.md
+/MIGRATION_EXAMPLES.md
+/README_COMPONENTS.md
+/REFACTORING_SUMMARY.md
+/COMPONENTS_EXAMPLES.md
+/DEPLOYMENT_CHECKLIST.md
+/FTP_DEPLOYMENT.md
+
+# Development tools
+/check_production.php
+/verify-structure.php
+/public/ftp-check.php
+/composer.json
+/composer.lock
+/package.json
+/tailwind.config.js
+
+# Agent files
+/.agent/
+
+# Static HTML (используется PHP версия)
+/index.html

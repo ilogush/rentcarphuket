@@ -1,0 +1,68 @@
+name: Deploy to FTP
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Prepare FTP config
+        shell: bash
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASS: ${{ secrets.FTP_PASS }}
+          FTP_ROOT_DIR: ${{ secrets.FTP_ROOT_DIR }}
+        run: |
+          missing=0
+          for name in FTP_HOST FTP_USER FTP_PASS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required GitHub secret: ${name}"
+              missing=1
+            fi
+          done
+          if [ -z "$FTP_ROOT_DIR" ]; then
+            echo "::warning::GitHub secret FTP_ROOT_DIR is empty; deployment will use the action default remote directory."
+          fi
+
+          remote_dir="${FTP_ROOT_DIR:-./}"
+          while [[ "$remote_dir" == /* ]]; do
+            remote_dir="${remote_dir#/}"
+          done
+          if [[ "$remote_dir" =~ ^www/[^/]+(/.*)?$ ]]; then
+            remote_dir="${remote_dir#www/}"
+            remote_dir="${remote_dir#*/}"
+          fi
+          if [ -z "$remote_dir" ] || [ "$remote_dir" = "." ]; then
+            remote_dir="./"
+          elif [[ "$remote_dir" != */ ]]; then
+            remote_dir="${remote_dir}/"
+          fi
+          echo "FTP_SERVER_DIR=${remote_dir}" >> "$GITHUB_ENV"
+          exit "$missing"
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          server-dir: ${{ env.FTP_SERVER_DIR }}
+          local-dir: ./
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/.env
+            **/.agent/**
+            **/node_modules/**
+            **/*.log

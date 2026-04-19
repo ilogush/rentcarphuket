@@ -1,0 +1,15 @@
+{
+    "name": "triptopcar/rentcarphuket",
+    "description": "Modern PHP Car Rental Project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "scripts": {
+        "serve": "php -S localhost:8000 server.php"
+    },
+    "require": {
+        "dompdf/dompdf": "^3.1"
+    }
+}

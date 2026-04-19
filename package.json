@@ -1,0 +1,13 @@
+{
+  "name": "rentcarphuket",
+  "version": "1.0.0",
+  "description": "Premium Car Rental Phuket",
+  "main": "index.php",
+  "scripts": {
+    "build": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.min.css --minify",
+    "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.min.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}

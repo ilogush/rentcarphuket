@@ -1,0 +1,20 @@
+# Robots.txt for rentcarphuket.ru
+User-agent: *
+Allow: /
+
+# Block admin panel
+Disallow: /admin/
+Disallow: /admin
+
+# Block internal files
+Disallow: /includes/
+Disallow: /app/
+Disallow: /vendor/
+Disallow: /storage/
+Disallow: /config/
+
+# Block action handlers
+Disallow: /admin/actions/
+
+# Sitemap
+Sitemap: https://rentcarphuket.ru/sitemap.xml

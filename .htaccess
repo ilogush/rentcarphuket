@@ -1,0 +1,89 @@
+# Performance: Gzip compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# Performance: Browser caching
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  
+  # Images
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+  
+  # CSS / Javascript
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+  
+  # Fonts
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/ttf "access plus 1 year"
+</IfModule>
+
+# Performance: Cache-Control headers
+<IfModule mod_headers.c>
+  <FilesMatch "\.(webp|png|jpg|jpeg|svg|gif|ico|css|js|woff2|woff|ttf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  
+  <FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# Security: Disable directory listing
+Options -Indexes +FollowSymLinks
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+</IfModule>
+
+# Routing and Access Control
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Security: Deny direct access to private folders
+    RewriteRule ^pages/ - [F,L]
+    RewriteRule ^app/ - [F,L]
+    RewriteRule ^includes/ - [F,L]
+    RewriteRule ^admin/actions/ - [F,L]
+    RewriteRule ^admin/partials/ - [F,L]
+    RewriteRule ^storage/ - [F,L]
+    RewriteRule ^\.env - [F,L]
+
+    # Serve shared assets
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^assets/(.+)$ public/asset.php?path=$1 [QSA,L]
+    
+    # Main Router
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . router.php [L]
+</IfModule>
+
+# Security: Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "(composer\.json|composer\.lock|package\.json|\.env)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
